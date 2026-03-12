@@ -1,4 +1,6 @@
-# Automated YouTube Viewing Manager
+# VidSift
+
+Ai-powered YouTube feed filtering and video relevance scoring.
 
 YouTube has a lot of videos, we all have a lot of YouTube channels we like, but there is still one problem:
 The Time.
@@ -24,6 +26,9 @@ The goal of this project is to solve this problem. To see how exactly, check out
 
 ## Features
 
+- RSS integration
+- transcript extraction
+- LLM scoring
 - Automated process of fetching, validating, taking action depending on validation
 - Runs in the background, no user intervention required
 
@@ -35,3 +40,4 @@ The goal of this project is to solve this problem. To see how exactly, check out
 ## Future improvements
 
 - make custom system prompt for fabric depending on the channel
+- make it with a background daemon that manages everything
