@@ -40,4 +40,11 @@ The goal of this project is to solve this problem. To see how exactly, check out
 ## Future improvements
 
 - make custom system prompt for fabric depending on the channel
-- make it with a background daemon that manages everything
+- make it witdaemon service
+- job queue
+- retry system
+- structured logging
+- rate limit handling
+- config system
+- plugin architecture
+- a background daemon that manages everything
