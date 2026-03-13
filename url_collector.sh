@@ -27,7 +27,7 @@ function main {
     while read -r name channelid; do
         echo "$name"
         echo "$channelid"
-    done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json | awk ' {print $1, $2} ')
+    done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json)
 }
 
 # call main with all args, as given
