@@ -31,7 +31,7 @@ function main {
             echo "processing $url ..."
             echo "$url" >>./already_processed_urls.txt
         fi
-    done < <(cat ./new_urls.txt)
+    done <./new_urls.txt
 }
 
 # call main with all args, as given

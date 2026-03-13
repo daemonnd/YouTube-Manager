@@ -28,7 +28,7 @@ function main {
         echo "Reading RSS feed from $name with channel id ${channelid}..."
         # extract all the urls from the xml
         while read -r url; do
-            echo "$url" >>list.txt
+            echo "$url" >>new_urls.txt
         done < <(curl -s "https://www.youtube.com/feeds/videos.xml?channel_id=$channelid" | xmllint --xpath "//*[local-name() = 'link']/@href" - | awk -F '"' ' {print $2} ' | grep -oE 'http.*watch.*')
     done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json)
 }
