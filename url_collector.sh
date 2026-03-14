@@ -23,12 +23,19 @@ function check_args {
     echo
 }
 
+function init {
+    if [[ ! -w ./already_processed_urls.txt ]]; then
+        touch ./already_processed_urls.txt
+    fi
+}
+
 function main {
+    init
+
     while read -r name channelid; do
-        echo "Reading RSS feed from $name with channel id ${channelid}..."
         # extract all the urls from the xml
         while read -r url; do
-            echo "$url" >>list.txt
+            echo "$url"
         done < <(curl -s "https://www.youtube.com/feeds/videos.xml?channel_id=$channelid" | xmllint --xpath "//*[local-name() = 'link']/@href" - | awk -F '"' ' {print $2} ' | grep -oE 'http.*watch.*')
     done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json)
 }
