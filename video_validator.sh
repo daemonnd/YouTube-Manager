@@ -32,7 +32,13 @@ function fetch_transcript {
 }
 
 function rate_video {
-    echo "$transcript" | fabric -sp vidsift_score_youtube_transcript
+    score=$(echo "$transcript" | fabric -sp vidsift_score_youtube_transcript)
+    # Check if the score is between 0 and 100 (0 & 100 are included)
+    if [[ "$score" -lt 0 || "$score" -gt 100 ]]; then
+        score=-1
+    fi
+    echo "$score"
+
 }
 
 function main {
