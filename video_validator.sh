@@ -23,13 +23,6 @@ trap 'echo "Error on line $LINENO video_validator.sh: command \"$BASH_COMMAND\" 
 # trap signals
 trap 'cleanup' INT TERM ERR
 
-function init {
-    # create the target dir
-    mkdir -p "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript"
-    # copy the custom pattern into fabric
-    cp ./vidsift_score_youtube_transcript.md "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
-}
-
 function check_args {
     :
 }
@@ -43,7 +36,6 @@ function rate_video {
 }
 
 function main {
-    init
     fetch_transcript "$1"
     rate_video
 }

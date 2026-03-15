@@ -24,8 +24,16 @@ trap 'cleanup' INT TERM ERR
 function check_args {
     :
 }
+function init {
+    # set up fabric system prompt for validation later
+    # create the target dir
+    mkdir -p "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript"
+    # copy the custom pattern into fabric
+    cp ./vidsift_score_youtube_transcript.md "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
+}
 
 function main {
+    init
     while read -r url; do
         echo "url: $url"
         score=$(./video_validator.sh "$url")
