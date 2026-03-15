@@ -24,6 +24,14 @@ trap 'cleanup' INT TERM ERR
 function check_args {
     :
 }
+
+function validate_target_dir {
+    if [[ ! -w "$1" || ! -d "$1" ]]; then
+        echo "ERROR: $2 target path seems to be corrupt. The user $USER needs writing permission to the dir at ${1}."
+        exit 1
+    fi
+}
+
 function init {
     # set up fabric system prompt for validation later
     # create the target dir
@@ -33,16 +41,9 @@ function init {
 
     # currently hardcoded dest paths
     download_path="/home/$USER/Videos/ytd/"
-    if [[ ! -w "$download_path" || ! -d "$download_path" ]]; then
-        echo "ERROR: Video download target path seems to be corrupt. The user $USER needs writing permission to the dir at ${download_path}."
-        exit 1
-    fi
-    summary_path="/home/$USER/Documents/markdown/ai_answers_fabrici/"
-    if [[ ! -w "$summary_path" || ! -d "$summary_path" ]]; then
-        echo "ERROR: Summary target path seems to be corrupt. The user $USER needs writing permission to the dir at ${summary_path}."
-        exit 1
-    fi
-
+    validate_target_dir "$download_path" "Video download"
+    summary_path="/home/$USER/Documents/markdown/ai_answers_fabric/"
+    validate_target_dir "$summary_path" "Ai summary"
 }
 
 function main {
