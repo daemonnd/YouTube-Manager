@@ -28,7 +28,7 @@ function main {
         if ! grep -q "$url" <./already_processed_urls.txt; then
             echo "$url"
         fi
-    done </dev/stdin
+    done
 }
 
 # call main with all args, as given
