@@ -6,7 +6,7 @@ set -Eeuo pipefail
 # Cleanup function
 function cleanup {
     local exit_code="$?"
-    echo "Script interupted or failed. Cleaning up..."
+    echo "Script url_validator.sh interupted or failed. Cleaning up..."
 
     # remove tmp files
 
@@ -15,7 +15,7 @@ function cleanup {
 }
 
 # trap errors
-trap 'echo "Error on line $LINENO: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
+trap 'echo "Error on line $LINENO in url_validator.sh: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
 # trap signals
 trap 'cleanup' INT TERM ERR
 
@@ -28,7 +28,7 @@ function main {
         if ! grep -q "$url" <./already_processed_urls.txt; then
             echo "$url"
         fi
-    done </dev/stdin
+    done
 }
 
 # call main with all args, as given
