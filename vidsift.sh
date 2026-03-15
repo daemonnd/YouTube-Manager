@@ -30,6 +30,19 @@ function init {
     mkdir -p "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript"
     # copy the custom pattern into fabric
     cp ./vidsift_score_youtube_transcript.md "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
+
+    # currently hardcoded dest paths
+    download_path="/home/$USER/Videos/ytd/"
+    if [[ ! -w "$download_path" || ! -d "$download_path" ]]; then
+        echo "ERROR: Video download target path seems to be corrupt. The user $USER needs writing permission to the dir at ${download_path}."
+        exit 1
+    fi
+    summary_path="/home/$USER/Documents/markdown/ai_answers_fabrici/"
+    if [[ ! -w "$summary_path" || ! -d "$summary_path" ]]; then
+        echo "ERROR: Summary target path seems to be corrupt. The user $USER needs writing permission to the dir at ${summary_path}."
+        exit 1
+    fi
+
 }
 
 function main {
