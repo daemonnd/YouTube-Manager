@@ -58,11 +58,17 @@ function main {
         elif [[ "$score" -gt 80 ]]; then
             echo "Downloading ${url}..."
             ./downloader.sh "$url" "$download_path"
+            # add the url to already_processed_urls.txt
+            echo "$url" >>./already_processed_urls.txt
         elif [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
             echo "Summarizing transcript of ${url}..."
             ./summarizer.sh "$summary_path"
+            # add the url to already_processed_urls.txt
+            echo "$url" >>./already_processed_urls.txt
         else
             echo "Then video with the url $url would neither have been summarized nor been downloaded, because its score is $score"
+            # add the url to already_processed_urls.txt
+            echo "$url" >>./already_processed_urls.txt
         fi
     done < <(./url_collector.sh | ./url_validator.sh)
 }
