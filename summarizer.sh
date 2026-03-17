@@ -24,8 +24,6 @@ function check_args {
 }
 
 function main {
-    touch /tmp/vidsift_title.txt
-    touch /tmp/vidsift_transcript.txt
     transcript="$(cat /tmp/vidsift_transcript.txt)"
     title="$(cat /tmp/vidsift_title.txt)"
     dest_path="${1}${title}.md"
