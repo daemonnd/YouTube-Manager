@@ -40,9 +40,9 @@ function init {
     cp ./vidsift_score_youtube_transcript.md "/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
 
     # currently hardcoded dest paths
-    download_path="/home/$USER/Videos/ytd/"
+    download_path="/home/$USER/Videos/vidsift/"
     validate_target_dir "$download_path" "Video download"
-    summary_path="/home/$USER/Documents/markdown/vidsift_testing"
+    summary_path="/home/$USER/Documents/vidsift"
     validate_target_dir "$summary_path" "Ai summary"
 }
 
