@@ -9,6 +9,12 @@ The problem is usually that we don't know which video is good and which one is n
 
 The goal of this project is to solve this problem. To see how exactly, check out the `How it works` section.
 
+## Usage
+
+1. Install the project from github
+2. Create & edit channelids.json in the project dir
+3. Create dirs at ~/Videos/vidsift and ~/Documents/vidsift
+
 ## How it works
 
 1. It reads the rss feed channel ids from the channelid.json file.
