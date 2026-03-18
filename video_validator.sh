@@ -36,7 +36,7 @@ function fetch_transcript {
 function rate_video {
     score=$(echo "$transcript" | fabric -sp vidsift_score_youtube_transcript)
     # Check if the score is between 0 and 100 (0 & 100 are included)
-    if [[ "$score" -lt 0 || "$score" -gt 100 ]]; then
+    if [[ ! "$score" -ge 0 && ! "$score" -le 100 ]]; then
         score=-1
     fi
     # write the transcript to a file if it should be summarized
