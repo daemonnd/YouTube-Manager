@@ -25,6 +25,13 @@ function check_args {
     echo
 }
 
+function rename_dest_path {
+    # if the user has the file renamer, rename it
+    if [[ -x /usr/local/bin/rename_one_file.sh ]]; then
+        /usr/local/bin/rename_one_file.sh 2 "$1"
+    fi
+}
+
 function main {
     # cd to target dir
     cd "$2"
@@ -33,6 +40,11 @@ function main {
         --merge-output-format mkv \
         --fragment-retries 10 \
         --retries 10 \
+        --exec 'if [[ ! -x /usr/local/bin/rename_one_file.sh ]]; then
+                    exit 0
+                fi
+                echo $0
+                /usr/local/bin/rename_one_file.sh 2 ' \
         "$1"
 }
 
