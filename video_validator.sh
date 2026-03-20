@@ -39,7 +39,6 @@ function get_custom_instuctions {
         custom_channel_instructions="$(cat ./custom_channel_instructions/$1.md)"
     else
         custom_channel_instructions=""
-        echo "Custom channel-specific instructions for channel $1 don't exist at ./custom_channel_instructions/$1.md, therefore the results will be more generic."
     fi
 }
 
