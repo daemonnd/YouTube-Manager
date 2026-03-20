@@ -1,4 +1,7 @@
 #!/bin/bash
+# File for validating the given url from url_collector.sh
+# If the url has already been processed (is in already_processed_urls.txt), it gets skippen
+# If not, it gets print together with the creator name to stdout for validation
 
 # strict mode
 set -Eeuo pipefail
@@ -24,9 +27,10 @@ function check_args {
 }
 
 function main {
-    while read -r url; do
+    while read -r url name; do
+        # only print the video url and creator name if it is not in already_processed_urls.txt
         if ! grep -q "$url" <./already_processed_urls.txt; then
-            echo "$url"
+            echo "$url $name"
         fi
     done
 }

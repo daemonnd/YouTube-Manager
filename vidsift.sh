@@ -1,6 +1,10 @@
 #!/bin/bash
 # main script
-# executes and orchestrates all the others
+# executes and orchestrates all the others:
+# Gets the video urls from url_collector.sh, then validates them using url_validator.sh
+# Runs video_validator.sh to validate the video
+# Downloads, summarizes or does nothing depending on the score
+# Go to the next video
 
 # strict mode
 set -Eeuo pipefail
@@ -48,9 +52,9 @@ function init {
 
 function main {
     init
-    while read -r url; do
-        echo "url: $url"
-        score=$(./video_validator.sh "$url" </dev/null)
+    while read -r url name; do
+        echo "Processing video $url from ${name}..."
+        score=$(./video_validator.sh "$url" "$name" </dev/null)
         if [[ "$score" -eq -1 ]]; then
             echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the score from the ai was not between 0 and 100."
             echo "Therefore, nothing will be done with this video."

@@ -1,4 +1,9 @@
 #!/bin/bash
+# File for fetching the channelids from channelids.json and dealing with the xml from each channel
+# It reads the rss feed, filters it down to the video links and creation date with awk,
+# then check if it is older than 2 weeks.
+# If it is older, it won't be processed
+# If it is newer, it gets print to stdout for further processing
 
 # strict mode
 set -Eeuo pipefail
@@ -24,6 +29,7 @@ function check_args {
 }
 
 function init {
+    # create the file already_processed_urls.txt only if it is non-existant
     if [[ ! -w ./already_processed_urls.txt ]]; then
         touch ./already_processed_urls.txt
     fi
@@ -35,14 +41,14 @@ function main {
     while read -r name channelid; do
         # extract all the urls from the xml
         while read -r date url; do
-            if ! date="$(echo $date | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}')"; then
+            if ! date="$(echo $date | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}')"; then # only if the line contains a valid date
                 continue
             fi
-            if [[ "$date" > "$(date -d '14 days ago' '+%F')" ]]; then
-                echo "$url"
+            if [[ "$date" > "$(date -d '14 days ago' '+%F')" ]]; then # checking if the date is older than 14 days. If older: do nothing, if newer: add to stdout for later processing
+                echo "$url $name"
             fi
         done < <(
-            # get the xml rss feed
+            # get the xml rss feed, filter it down to the publication date and link with awk
             xml=$(curl -s "https://www.youtube.com/feeds/videos.xml?channel_id=$channelid")
             echo "$xml" | awk -F '"' ' $0 ~ /link/ || $0 ~/published/ {
                     if ( $0 ~ /watch/ ) {

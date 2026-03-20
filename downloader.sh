@@ -1,4 +1,6 @@
 #!/bin/bash
+# File for downloading a video
+# It gets the url and target dir and downloads the video to the target dir using yt-dlp
 
 # strict mode
 set -Eeuo pipefail

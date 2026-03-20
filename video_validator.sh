@@ -24,13 +24,31 @@ trap 'echo "Error on line $LINENO video_validator.sh: command \"$BASH_COMMAND\" 
 trap 'cleanup' INT TERM ERR
 
 function check_args {
-    :
+    : "${2:?ERROR: The second arg that should contain the creator name has not been set}"
 }
 
 function fetch_transcript {
     if ! transcript="$(fabric -y "$1" --yt-dlp-args="--cookies-from-browser firefox")"; then
         return 1
     fi
+}
+
+function get_custom_instuctions {
+    # function to get the channel-specific instructions for ai validation
+    if [[ -r "./custom_channel_instructions/$1.md" ]]; then
+        custom_channel_instructions="$(cat ./custom_channel_instructions/$1.md)"
+    else
+        custom_channel_instructions=""
+    fi
+}
+
+function create_final_system_prompt {
+    # function for merging the system prompt with the custom channel-specific instructions for the ai
+    base_system_prompt="$(cat ./vidsift_score_youtube_transcript.md)"
+    final_system_prompt="${base_system_prompt//'$CUSTOM_CHANNEL_INSTRUCTIONS'/$custom_channel_instructions}"
+
+    # replace the current system prompt for the ai by the new one
+    echo "$final_system_prompt" >"/home/$USER/.config/fabric/patterns/vidsift_score_youtube_transcript/system.md"
 }
 
 function rate_video {
@@ -53,6 +71,10 @@ function main {
         echo -1
         return 0
     fi
+    check_args "$@"
+    get_custom_instuctions "$2"
+    create_final_system_prompt
+
     rate_video "$@"
 }
 

@@ -34,6 +34,8 @@ The goal of this project is to solve this problem. To see how exactly, check out
 
 - RSS integration
 - transcript extraction
+- video filtering, only takes videos from the last 2 weeks
+- make custom system prompt for ai validation depending on the channel
 - LLM scoring
 - Automated process of fetching, validating, taking action depending on validation
 - Runs in the background, no user intervention required
@@ -64,13 +66,19 @@ Script url_collector.sh interupted or failed. Cleaning up...
 
 ## Future improvements
 
-- make custom system prompt for fabric depending on the channel
-- also extract the title of the yt video for summary naming convention
-- make it witdaemon service
+- make it with a daemon service
 - job queue
 - retry system
 - structured logging
 - rate limit handling
-- config system
+- config system for target dirs, which videos to pick, from which channles vidsift should auto-download and auto-summarize without ai scoring
 - plugin architecture
 - a background daemon that manages everything
+
+## Todo
+
+### channel instructions
+
+1. Add name to the pipeline
+2. Look for md files that match the name in the project dir
+3. Replace the placeholder $CUSTOM_CHANNEL_INSTRUCTIONS with the actual channel instructions from the file

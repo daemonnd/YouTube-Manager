@@ -2,3 +2,5 @@ already_processed_urls.txt
 new_urls.txt
 channelids.json
 reader.sh
+custom_channel_instructions/*
+
