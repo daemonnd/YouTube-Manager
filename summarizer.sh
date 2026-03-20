@@ -1,4 +1,6 @@
 #!/bin/bash
+# File for summarizing a yt video transcript.
+# It uses fabric for the ai and reads the transcript from a tmp file, the destination path is given as argument
 
 # strict mode
 set -Eeuo pipefail

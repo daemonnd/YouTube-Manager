@@ -1,6 +1,10 @@
 #!/bin/bash
 # main script
-# executes and orchestrates all the others
+# executes and orchestrates all the others:
+# Gets the video urls from url_collector.sh, then validates them using url_validator.sh
+# Runs video_validator.sh to validate the video
+# Downloads, summarizes or does nothing depending on the score
+# Go to the next video
 
 # strict mode
 set -Eeuo pipefail
