@@ -9,12 +9,6 @@ The problem is usually that we don't know which video is good and which one is n
 
 The goal of this project is to solve this problem. To see how exactly, check out the `How it works` section.
 
-## Usage
-
-1. Install the project from github
-2. Create & edit channelids.json in the project dir
-3. Create dirs at ~/Videos/vidsift and ~/Documents/vidsift
-
 ## How it works
 
 1. It reads the rss feed channel ids from the channelid.json file.
@@ -40,6 +34,38 @@ The goal of this project is to solve this problem. To see how exactly, check out
 - Automated process of fetching, validating, taking action depending on validation
 - Runs in the background, no user intervention required
 
+## Usage
+
+1. Install it (pre-v1, not ready for general use)
+2. Create a dir at ~/Videos/vidsift/ and one at ~/Documents/vidsift/
+3. Create a new file name channelids.json
+    Edit it, make it like this:
+
+    ```json
+    {
+        "<channel name>": "<matching channel id>",
+        "<channel name 2>": "<matching channel id>"
+    }
+    ```
+
+    Example:
+
+    ```json
+    {
+        "typecraft": "UCo71RUe6DX4w-Vd47rFLXPg",
+        "networkchuck": "UC9x0AN7BWHpCDHSm9NiJFJQ",
+        "pewdiepie": "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
+    }
+    ```
+
+4. Edit the custom instructions:
+
+    - go to ./custom_channel_instructions/
+    - create a file for each name and put in what kind of videos you want to see from that channel
+    - if you want to do it for typecraft: touch ./custom_channel_instructions/typecraft.md
+
+5. Run vidsift.sh with `./vidsift.sh`
+
 ## Issues & How to fix them
 
 - YouTube rate limit exeded: Add the url to already_processed_urls.txt
@@ -61,8 +87,14 @@ Script url_collector.sh interupted or failed. Cleaning up...
 
 ## Dependencies
 
-- [fabric](https://github.com/danielmiessler/Fabric) for fetching the transcript and using the ai
-- yt-dlp for downloading the yt video
+### Required Dependencies
+
+- [fabric](https://github.com/danielmiessler/Fabric) for fetching the transcript and using the ai, with a working ai model
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) for downloading the yt video
+
+### Optional Dependencies
+
+- [file-renamer](https://github.com/daemonnd/file-renamer) for automatically rename video and summary files for a linux fs
 
 ## Future improvements
 
