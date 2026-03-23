@@ -23,7 +23,7 @@ function check_args {
     echo
 }
 
-function main {
+function init {
     # set directories
     # config dir
     VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME:-"$HOME/.config/vidsift"}}"
@@ -32,8 +32,10 @@ function main {
     # vidsift bin dir
     VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin"}}"
     # helper scripts dir
-    VIDSIFT_HELPER_SCRIPTS_DIR="${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}"
+    VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
+}
 
+function create_directories {
     # create the directories if they don't exist
     # config dir
     mkdir -p "$VIDSIFT_CONFIG_DIR"
@@ -43,7 +45,9 @@ function main {
     mkdir -p "$VIDSIFT_BIN_DIR"
     # helper scripts dir
     mkdir -p "$VIDSIFT_HELPER_SCRIPTS_DIR"
+}
 
+function cp_files {
     # copying the files to their target locations
     # config
     cp ./channelids.json "$VIDSIFT_CONFIG_DIR/channelids.json"
@@ -59,7 +63,9 @@ function main {
     cp ./video_validator.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/video_validator"
     cp ./downloader.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/downloader"
     cp ./summarizer.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/summarizer"
+}
 
+function set_permissions {
     # giving execute permissions to the vidsift bin and helper scripts
     # vidsift bin
     chmod +x "$VIDSIFT_BIN_DIR/vidsift"
@@ -69,6 +75,13 @@ function main {
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/video_validator"
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/downloader"
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/summarizer"
+}
+
+function main {
+    init "$@"
+    create_directories "$@"
+    cp_files "$@"
+    set_permissions "$@"
 }
 
 # call main with all args, as given
