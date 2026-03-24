@@ -6,7 +6,7 @@ set -Eeuo pipefail
 # Cleanup function
 function cleanup {
     local exit_code="$?"
-    echo "Script <script name> interrupted or failed. Cleaning up..."
+    echo "Script install.sh interrupted or failed. Cleaning up..."
 
     # remove tmp files
 
@@ -15,17 +15,25 @@ function cleanup {
 }
 
 # trap errors
-trap 'echo "Error on line $LINENO in <script name>: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
+trap 'echo "Error on line $LINENO in install.sh: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
 # trap signals
 trap 'cleanup' INT TERM ERR
 
 function check_args {
-    echo
+    # check if the script is being run with arguments
+    # check for arguments for a fresh install
+    for arg in "$@"; do
+        case "$arg" in
+        "fresh")
+            fresh_install="true"
+            ;;
+        esac
+    done
 }
 
 function clone_repo {
     # cloning the repo to a dir named vidsift in the current directory, and cd into it
-    git clone "https://github.com/daemonnd/VidSift.git" vidsift && cd vidsift
+    git clone "https://github.com/daemonnd/VidSift.git" "vidsift" && cd "vidsift"
 }
 
 function init {
@@ -38,6 +46,9 @@ function init {
     VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin"}}"
     # helper scripts dir
     VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
+
+    # set default values for flags
+    fresh_install="false"
 }
 
 function create_directories {
@@ -55,11 +66,12 @@ function create_directories {
 function cp_files {
     # copying the files to their target locations
     # config
-    cp ./channelids.json "$VIDSIFT_CONFIG_DIR/channelids.json"
-    cp -r ./custom_channel_instructions/ "$VIDSIFT_CONFIG_DIR/custom_channel_instructions"
+    cp ./channelids.json "$VIDSIFT_CONFIG_DIR/channelids.json" || true                             # only copy if it does exist, to preserve user modifications
+    cp -r ./custom_channel_instructions/ "$VIDSIFT_CONFIG_DIR/custom_channel_instructions" || true # only copy if it does exist, to preserve user modifications
     cp ./vidsift_score_youtube_transcript.md "$VIDSIFT_CONFIG_DIR/vidsift_score_youtube_transcript.md"
     # data
-    cp ./already_processed_urls.txt "$VIDSIFT_DATA_DIR/already_processed_urls.txt"
+    cp ./already_processed_urls.txt "$VIDSIFT_DATA_DIR/already_processed_urls.txt" || true # only copy if it does exist, to preserve user modifications
+    echo "If you are doing a fresh install, you can ingore the above warnings about channelids.json, custom_channel_instructions, and already_processed_urls.txt. These files are only copied if they don't already exist, to preserve any modifications you may have made to them."
     # vidsift bin
     cp ./vidsift.sh "$VIDSIFT_BIN_DIR/vidsift"
     # helper scripts
@@ -84,6 +96,11 @@ function set_permissions {
 
 function main {
     init "$@"
+    check_args "$@"
+    if [[ "$fresh_install" == "true" ]]; then
+        echo "Performing a fresh install..."
+        clone_repo "$@"
+    fi
     create_directories "$@"
     cp_files "$@"
     set_permissions "$@"
