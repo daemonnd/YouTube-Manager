@@ -108,10 +108,13 @@ function set_permissions {
 function main {
     init "$@"
     check_args "$@"
+    change_to=""
     if [[ "$fresh_install" == "true" ]]; then
         echo "Performing a fresh install..."
         clone_repo "$@"
+        change_to="vidsift"
     fi
+    cd "$change_to"
     create_directories "$@"
     cp_files "$@"
     set_permissions "$@"
