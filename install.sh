@@ -79,18 +79,39 @@ function cp_files {
     # config
     cp ./channelids.json "$VIDSIFT_CONFIG_DIR/channelids.json" || true                             # only copy if it does exist, to preserve user modifications
     cp -r ./custom_channel_instructions/ "$VIDSIFT_CONFIG_DIR/custom_channel_instructions" || true # only copy if it does exist, to preserve user modifications
-    cp ./vidsift_score_youtube_transcript.md "$VIDSIFT_CONFIG_DIR/vidsift_score_youtube_transcript.md"
+    cp ./vidsift_score_youtube_transcript.md "$VIDSIFT_CONFIG_DIR/vidsift_score_youtube_transcript.md" || {
+        echo "ERROR: vidsift_score_youtube_transcript.md not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
     # data
     cp ./already_processed_urls.txt "$VIDSIFT_DATA_DIR/already_processed_urls.txt" || true # only copy if it does exist, to preserve user modifications
     echo "If you are doing a fresh install, you can ingore the above warnings about channelids.json, custom_channel_instructions, and already_processed_urls.txt. These files are only copied if they don't already exist, to preserve any modifications you may have made to them."
     # vidsift bin
-    cp ./vidsift.sh "$VIDSIFT_BIN_DIR/vidsift"
+    cp ./vidsift.sh "$VIDSIFT_BIN_DIR/vidsift" || {
+        echo "ERROR: vidsift.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
     # helper scripts
-    cp ./url_collector.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/url_collector"
-    cp ./url_validator.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/url_validator"
-    cp ./video_validator.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/video_validator"
-    cp ./downloader.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/downloader"
-    cp ./summarizer.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/summarizer"
+    cp ./url_collector.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/url_collector" || {
+        echo "ERROR: url_collector.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
+    cp ./url_validator.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/url_validator" || {
+        echo "ERROR: url_validator.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
+    cp ./video_validator.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/video_validator" || {
+        echo "ERROR: video_validator.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
+    cp ./downloader.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/downloader" || {
+        echo "ERROR: downloader.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
+    cp ./summarizer.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/summarizer" || {
+        echo "ERROR: summarizer.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
 }
 
 function set_permissions {
@@ -108,13 +129,10 @@ function set_permissions {
 function main {
     init "$@"
     check_args "$@"
-    change_to=""
     if [[ "$fresh_install" == "true" ]]; then
         echo "Performing a fresh install..."
         clone_repo "$@"
-        change_to="vidsift"
     fi
-    cd "$change_to"
     create_directories "$@"
     cp_files "$@"
     set_permissions "$@"
