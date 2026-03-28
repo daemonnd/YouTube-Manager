@@ -37,8 +37,9 @@ function main {
     title="$(cat /tmp/vidsift_title.txt)"
     dest_path="${1}/${title}.md"
     echo "$transcript" | fabric -sp youtube_summary >"$dest_path"
+
+    rename_dest_path
 }
 
 # call main with all args, as given
 main "$@"
-rename_dest_path
