@@ -29,7 +29,7 @@ function check_args {
 function main {
     while read -r url name; do
         # only print the video url and creator name if it is not in already_processed_urls.txt
-        if ! grep -q "$url" <./already_processed_urls.txt; then
+        if ! grep -q "$url" <"$VIDSIFT_DATA_DIR"/already_processed_urls.txt; then
             echo "$url $name"
         fi
     done

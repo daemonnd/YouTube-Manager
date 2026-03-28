@@ -40,6 +40,7 @@ function main {
         --merge-output-format mkv \
         --fragment-retries 10 \
         --retries 10 \
+        --cookies-from-browser firefox \
         --exec 'if [[ ! -x /usr/local/bin/rename_one_file.sh ]]; then
                     exit 0
                 fi

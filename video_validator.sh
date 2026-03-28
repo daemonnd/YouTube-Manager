@@ -44,7 +44,7 @@ function get_custom_instuctions {
 
 function create_final_system_prompt {
     # function for merging the system prompt with the custom channel-specific instructions for the ai
-    base_system_prompt="$(cat ./vidsift_score_youtube_transcript.md)"
+    base_system_prompt="$(cat "$VIDSIFT_CONFIG_DIR"/vidsift_score_youtube_transcript.md)"
     final_system_prompt="${base_system_prompt//'$CUSTOM_CHANNEL_INSTRUCTIONS'/$custom_channel_instructions}"
 
     # replace the current system prompt for the ai by the new one
@@ -53,6 +53,12 @@ function create_final_system_prompt {
 
 function rate_video {
     score=$(echo "$transcript" | fabric -sp vidsift_score_youtube_transcript)
+    # Check if score is a number
+    if [[ "$score" =~ ^[0-9]+$ ]]; then
+        score="$score"
+    else
+        score=-2
+    fi
     # Check if the score is between 0 and 100 (0 & 100 are included)
     if [[ ! "$score" -ge 0 && ! "$score" -le 100 ]]; then
         score=-1

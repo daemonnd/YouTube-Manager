@@ -30,8 +30,8 @@ function check_args {
 
 function init {
     # create the file already_processed_urls.txt only if it is non-existant
-    if [[ ! -w ./already_processed_urls.txt ]]; then
-        touch ./already_processed_urls.txt
+    if [[ ! -w "$VIDSIFT_DATA_DIR"/already_processed_urls.txt ]]; then
+        touch "$VIDSIFT_DATA_DIR"/already_processed_urls.txt
     fi
 }
 
@@ -63,7 +63,7 @@ function main {
                 }'
         )
 
-    done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' channelids.json)
+    done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' "$VIDSIFT_CONFIG_DIR"/channelids.json)
 }
 
 # call main with all args, as given
