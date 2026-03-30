@@ -33,11 +33,15 @@ function init {
     if [[ ! -w "$VIDSIFT_DATA_DIR"/already_processed_urls.txt ]]; then
         touch "$VIDSIFT_DATA_DIR"/already_processed_urls.txt
     fi
+    # parse the config file, savaing the relevant channels for the different operations to variables
+    VALIDATE_CHANNELS="$(jq '.channel_operations.validate' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+    DOWNLOAD_CHANNELS="$(jq '.channel_operations.download' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+    SUMMARY_CHANNELS="$(jq '.channel_operations.summary' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
 }
 
-function main {
-    init
-
+function read_channelids {
+    local operation_var="${1^^}_CHANNELS"   # get the variable name in uppercase with _CHANNELS suffix, e.g. VALIDATE_CHANNELS
+    local operation_var="${!operation_var}" # indirect variable expansion to get the value of the variable, which is a json object with channel names as keys and channel ids as values
     while read -r name channelid; do
         # extract all the urls from the xml
         while read -r date url; do
@@ -45,7 +49,7 @@ function main {
                 continue
             fi
             if [[ "$date" > "$(date -d '14 days ago' '+%F')" ]]; then # checking if the date is older than 14 days. If older: do nothing, if newer: add to stdout for later processing
-                echo "$url $name"
+                echo "$url $name" "$1"
             fi
         done < <(
             # get the xml rss feed, filter it down to the publication date and link with awk
@@ -63,7 +67,15 @@ function main {
                 }'
         )
 
-    done < <(jq -r "to_entries[]"' | [.key, .value] | @tsv' "$VIDSIFT_CONFIG_DIR"/channelids.json)
+    done < <(echo "$operation_var" | jq -r "to_entries[]"' | [.key, .value] | @tsv')
+}
+
+function main {
+    init
+    read_channelids "validate"
+    read_channelids "download"
+    read_channelids "summary"
+
 }
 
 # call main with all args, as given
