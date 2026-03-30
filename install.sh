@@ -112,6 +112,10 @@ function cp_files {
         echo "ERROR: summarizer.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
         exit 1
     }
+    cp ./parse_config.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/parse_config" || {
+        echo "ERROR: parse_config.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
 }
 
 function set_permissions {
