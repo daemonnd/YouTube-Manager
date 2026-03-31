@@ -87,7 +87,10 @@ function main {
         # validate: let ai validate the transcript and decide wether to download, summarize or do nothing with the video, depending on the score
         if [[ "$action" == "validate" ]]; then
             # fetch the necessary video data for validation and maybe summarization
-            "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url"
+            if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url"; then
+                echo "ERROR: Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
+                continue
+            fi
             # get the score from the ai
             score=$("$VIDSIFT_HELPER_SCRIPTS_DIR"/video_validator "$url" "$name" </dev/null)
             # if there was an error during the validation, the video gets skipped
@@ -123,7 +126,9 @@ function main {
         # summarize: summarize the video transcript without validating it with ai
         elif [[ "$action" == "summary" ]]; then
             # fetch the necessary video data for summarization (transcript and title)
-            "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url"
+            if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url"; then
+                echo "ERROR: Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
+            fi
             summarize_video "$url"
             # add the url to already_processed_urls.txt
             echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
