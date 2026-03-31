@@ -116,6 +116,10 @@ function cp_files {
         echo "ERROR: parse_config.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
         exit 1
     }
+    cp ./fetch_video_data.sh "$VIDSIFT_HELPER_SCRIPTS_DIR/fetch_video_data" || {
+        echo "ERROR: fetch_video_data.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+        exit 1
+    }
 }
 
 function set_permissions {
@@ -128,6 +132,8 @@ function set_permissions {
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/video_validator"
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/downloader"
     chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/summarizer"
+    chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/parse_config"
+    chmod +x "$VIDSIFT_HELPER_SCRIPTS_DIR/fetch_video_data"
 }
 
 function check_installation_path {
