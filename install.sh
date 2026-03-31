@@ -77,7 +77,6 @@ function create_directories {
 function cp_files {
     # copying the files to their target locations
     # config
-    cp ./channelids.json "$VIDSIFT_CONFIG_DIR/channelids.json" || true                             # only copy if it does exist, to preserve user modifications
     cp -r ./custom_channel_instructions/ "$VIDSIFT_CONFIG_DIR/custom_channel_instructions" || true # only copy if it does exist, to preserve user modifications
     cp ./vidsift_score_youtube_transcript.md "$VIDSIFT_CONFIG_DIR/vidsift_score_youtube_transcript.md" || {
         echo "ERROR: vidsift_score_youtube_transcript.md not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
