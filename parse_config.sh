@@ -29,7 +29,7 @@ function main {
     gsub(/\/\/.*/, "") 
     print $0
     }
-    '
+    ' | envsubst
 }
 # call main with all args, as given
 main "$@"
