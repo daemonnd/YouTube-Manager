@@ -34,7 +34,7 @@ function init {
 function get_custom_instuctions {
     # function to get the channel-specific instructions for ai validation
     if [[ -r "$VIDSIFT_CONFIG_DIR/custom_channel_instructions/$1.md" ]]; then
-        custom_channel_instructions="$(cat ./custom_channel_instructions/$1.md)"
+        custom_channel_instructions="$(cat "$VIDSIFT_CONFIG_DIR"/custom_channel_instructions/$1.md)"
     else
         custom_channel_instructions=""
     fi
