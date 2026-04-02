@@ -37,6 +37,8 @@ function init {
     VALIDATE_CHANNELS="$(jq '.channel_operations.validate' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     DOWNLOAD_CHANNELS="$(jq '.channel_operations.download' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     SUMMARY_CHANNELS="$(jq '.channel_operations.summary' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+    # get the date when the videos should be newer than
+    UPLOADED_BEFORE="$(jq -r '.video_filtering.uploaded_before' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
 }
 
 function read_channelids {
@@ -48,7 +50,7 @@ function read_channelids {
             if ! date="$(echo $date | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}')"; then # only if the line contains a valid date
                 continue
             fi
-            if [[ "$date" > "$(date -d '14 days ago' '+%F')" ]]; then # checking if the date is older than 14 days. If older: do nothing, if newer: add to stdout for later processing
+            if [[ "$date" > "$(date -d "$UPLOADED_BEFORE" '+%F')" ]]; then # checking if the date is older than 14 days. If older: do nothing, if newer: add to stdout for later processing
                 echo "$url $name" "$1"
             fi
         done < <(

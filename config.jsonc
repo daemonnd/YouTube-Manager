@@ -34,7 +34,7 @@
     // ####################################
     // video filtering options, which videos should be used for later processing
     "video_filtering": {
-        "updatded_before": "14 days ago" // uses date -d
+        "uploaded_before": "14 days ago" // uses date -d
     },
     // #####################################
     // ----------General processing---------
