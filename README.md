@@ -33,6 +33,8 @@ The goal of this project is to solve this problem. To see how exactly, check out
 - LLM scoring
 - Automated process of fetching, validating, taking action depending on validation
 - Runs in the background, no user intervention required
+- config system with options for ai model selection, destination directories, etc.
+- channel specific actions performed on every video (validate, summary, download) depending on the channel
 
 ## Usage
 
@@ -99,10 +101,10 @@ Script url_collector.sh interupted or failed. Cleaning up...
 ## Future improvements
 
 - make it with a daemon service
+- replace fresh arg in install.sh by local arg, so that it can be used for updates and not just fresh installs
 - job queue
 - retry system
 - structured logging
 - rate limit handling
-- config system for target dirs, which videos to pick, from which channles vidsift should auto-download and auto-summarize without ai scoring
 - plugin architecture
 - a background daemon that manages everything
