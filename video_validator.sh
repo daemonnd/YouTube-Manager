@@ -29,6 +29,9 @@ function check_args {
 
 function init {
     transcript="$(cat /tmp/vidsift_transcript.txt)"
+    # get ai model and provider
+    AI_MODEL="$(jq -r '.general_processing.ai_model' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+    AI_PROVIDER="$(jq -r '.general_processing.ai_provider' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
 }
 
 function get_custom_instuctions {
@@ -50,7 +53,7 @@ function create_final_system_prompt {
 }
 
 function rate_video {
-    score=$(echo "$transcript" | fabric -sp vidsift_score_youtube_transcript)
+    score=$(echo "$transcript" | fabric --vendor "$AI_PROVIDER" --model "$AI_MODEL" -sp vidsift_score_youtube_transcript)
     # Check if score is a number
     if [[ "$score" =~ ^[0-9]+$ ]]; then
         :

@@ -45,7 +45,9 @@
             // one word needs one field, so if you have multiple args, you need to split them into multiple fields
             "--cookies-from-browser",
             "firefox" // use cookies from a browser to avoid YouTube Errors like sign in to prove that you aren't a bot
-        ]
+        ],
+        "ai_provider": "ollama", // which ai provider to use for video validation and summarization, each one that fabric supports should work, but currently only ollama is tested
+        "ai_model": "qwen3.5:35b" // which ai model to use for video validation and summarization, each one that fabric supports should work
     },
     //
     // #####################################

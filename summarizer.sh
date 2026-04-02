@@ -25,6 +25,12 @@ function check_args {
     echo
 }
 
+function init {
+    # get ai model and provider
+    AI_MODEL="$(jq -r '.general_processing.ai_model' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+    AI_PROVIDER="$(jq -r '.general_processing.ai_provider' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+}
+
 function rename_dest_path {
     # if the user has the file renamer, rename it
     if [[ -x /usr/local/bin/rename_one_file.sh ]]; then
@@ -33,10 +39,12 @@ function rename_dest_path {
 }
 
 function main {
+    init "$@"
+
     transcript="$(cat /tmp/vidsift_transcript.txt)"
     title="$(cat /tmp/vidsift_title.txt)"
     dest_path="${1}/${title}.md"
-    echo "$transcript" | fabric -sp youtube_summary >"$dest_path"
+    echo "$transcript" | fabric --vendor "$AI_PROVIDER" --model "$AI_MODEL" -sp youtube_summary >"$dest_path"
 
     rename_dest_path
 }
