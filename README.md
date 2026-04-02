@@ -101,7 +101,6 @@ Script url_collector.sh interupted or failed. Cleaning up...
 ## Future improvements
 
 - make it with a daemon service
-- replace fresh arg in install.sh by local arg, so that it can be used for updates and not just fresh installs
 - job queue
 - retry system
 - structured logging
