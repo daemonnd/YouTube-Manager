@@ -77,6 +77,15 @@ function create_directories {
 function cp_files {
     # copying the files to their target locations
     # config
+    if [[ ! -f "${VIDSIFT_CONFIG_DIR%/}"/config.jsonc ]]; then
+        echo "Copying default config.jsonc to ${VIDSIFT_CONFIG_DIR%/}/config.jsonc, because it does not exist or is not readable."
+        cp ./config.jsonc "${VIDSIFT_CONFIG_DIR%/}/config.jsonc" || {
+            echo "ERROR: config.jsonc not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
+            exit 1
+        }
+    else
+        echo "config.jsonc already exists in $VIDSIFT_CONFIG_DIR. Skipping copy to preserve user modifications."
+    fi
     cp -r ./custom_channel_instructions/ "$VIDSIFT_CONFIG_DIR/custom_channel_instructions" || true # only copy if it does exist, to preserve user modifications
     cp ./vidsift_score_youtube_transcript.md "$VIDSIFT_CONFIG_DIR/vidsift_score_youtube_transcript.md" || {
         echo "ERROR: vidsift_score_youtube_transcript.md not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
@@ -84,7 +93,7 @@ function cp_files {
     }
     # data
     cp ./already_processed_urls.txt "$VIDSIFT_DATA_DIR/already_processed_urls.txt" || true # only copy if it does exist, to preserve user modifications
-    echo "If you are doing a fresh install, you can ingore the above warnings about channelids.json, custom_channel_instructions, and already_processed_urls.txt. These files are only copied if they don't already exist, to preserve any modifications you may have made to them."
+    echo "If you are doing a fresh install, you can ignore the above warnings about, custom_channel_instructions, and already_processed_urls.txt. These files are only copied if they don't already exist, to preserve any modifications you may have made to them."
     # vidsift bin
     cp ./vidsift.sh "$VIDSIFT_BIN_DIR/vidsift" || {
         echo "ERROR: vidsift.sh not found. Please make sure it is in the same directory as this install.sh script, which is the project root directory."
