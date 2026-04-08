@@ -112,10 +112,20 @@ EOF
         exit 1
     fi
 
-    echo "This script assumes that the vidsift bin dir of the sudo user is $SUDO_HOME/.local/bin/. If it is wrong, edit the service file."
+    echo "This script assumes that the vidsift bin dir of the sudo user is ${VIDSIFT_BIN_DIR}. If it is wrong, edit the service file."
+    cat <<EOF >/etc/systemd/system/vidsift-manager.timer
+[Unit]
+Description=Timer for when restarting vidsift in the background after it exits
+[Timer]
+OnUnitActiveSec=900
+OnBootSec=120
+Unit=vidsift_manager.service
+[Install]
+WantedBy=timers.target
+EOF
 
     systemctl daemon-reload
-    systemctl enable vidsift-manager.service
+    systemctl enable vidsift-manager.timer
 
     echo "The background daemon has been set up successfully"
     echo "Vidsift has not been installed. Please re-run this install script without root priviledges to install or update vidsift."
