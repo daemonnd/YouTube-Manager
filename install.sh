@@ -53,7 +53,10 @@ function init {
     # data dir
     VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share/vidsift/}}"
     # vidsift bin dir
-    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
+    # to prevent making this /root/.local/bin when ran as root
+    if [[ "$install_vidsift" == "true" ]]; then
+        VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
+    fi
     # helper scripts dir
     VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
 
@@ -119,7 +122,7 @@ Description=Timer for when restarting vidsift in the background after it exits
 [Timer]
 OnUnitActiveSec=900
 OnBootSec=120
-Unit=vidsift_manager.service
+Unit=vidsift-manager.service
 [Install]
 WantedBy=timers.target
 EOF
@@ -203,17 +206,19 @@ function set_permissions {
 
 function check_installation_path {
     # check if vidsift bin dir in in $PATH, and if not, add it to ~/.bashrc and print a warning
-    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
-    if echo "$PATH" | grep -IFq "$VIDSIFT_BIN_DIR"; then
-        mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
-        echo "vidsift bin directory $VIDSIFT_BIN_DIR is already in your PATH."
-    else
-        mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
-        if [[ "$HOME" != *"root"* ]]; then
-            echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
-            echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+    if [[ "$install_vidsift" == "true" ]]; then
+        VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
+        if echo "$PATH" | grep -IFq "$VIDSIFT_BIN_DIR"; then
+            mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
+            echo "vidsift bin directory $VIDSIFT_BIN_DIR is already in your PATH."
+        else
+            mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
+            if [[ "$HOME" != *"root"* ]]; then
+                echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
+                echo "Please run 'source ~/.bashrc' to add the vidsift bin directory to your PATH"
+            fi
+            echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file if you are not root."
         fi
-        echo "WARNING: $VIDSIFT_BIN_DIR is not in your PATH. It has been added to your ~/.bashrc file if you are not root."
     fi
 }
 

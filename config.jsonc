@@ -49,7 +49,15 @@
             "1" // sleep 1 second between each request to avoid rate limiting
         ],
         "ai_provider": "ollama", // which ai provider to use for video validation and summarization, each one that fabric supports should work, but currently only ollama is tested
-        "ai_model": "qwen3.5:35b" // which ai model to use for video validation and summarization, each one that fabric supports should work
+        "ai_model": "qwen3.5:35b", // which ai model to use for video validation and summarization, each one that fabric supports should work
+        "required_paths": [
+            // what paths are required to be in $PATH
+            // they have to be ABSOLUTE
+            // Make sure to put all there because when using vidsift with the background service, the .bashrc file does not get executed
+            "$HOME/.local/bin/",
+            "/usr/bin/",
+            "/usr/local/bin/"
+        ]
     },
     //
     // #####################################

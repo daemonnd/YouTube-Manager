@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 
 function rm_tmp_files {
-    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
+    #    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
     rm "/tmp/vidsift_transcript.txt" 2>/dev/null || true
     rm "/tmp/vidsift_title.txt" 2>/dev/null || true
 }
@@ -67,6 +67,14 @@ function init {
     validate_target_dir "$download_path" "Video download"
     summary_path="$(jq -r '.dest_paths.summaries' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     validate_target_dir "$summary_path" "Ai summary"
+
+    # add the paths that $PATH needs and export it
+    mapfile -t required_paths < <(cat "$VIDSIFT_DATA_DIR/parsed_config.json" | jq -r '.general_processing.required_paths[]')
+    old_ifs="$IFS"
+    IFS=:
+    required_paths=$(echo "${required_paths[*]}") #  elements get joined together depending on first character of $IFS
+    export PATH="$PATH:$required_paths"
+    IFS="$old_ifs"
 }
 
 function download_video {
