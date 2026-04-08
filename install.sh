@@ -40,6 +40,13 @@ function clone_repo {
 }
 
 function init {
+    # checking if the root user or a regular user is running the script
+    if [[ "$EUID" -ne 0 || -z "$SUDO_USER" ]]; then
+        install_vidsift="true"
+    else
+        install_vidsift="false"
+    fi
+
     # set directories
     # config dir
     VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME-${HOME}/.config/vidsift/}}"
@@ -111,7 +118,6 @@ EOF
 
     echo "The background daemon has been set up successfully"
     echo "Vidsift has not been installed. Please re-run this install script without root priviledges to install or update vidsift."
-    exit 0
 }
 
 function cp_files {
@@ -200,18 +206,36 @@ function check_installation_path {
     fi
 }
 
+function before_install {
+    if [[ "$install_vidsift" != "true" ]]; then
+        echo "ERROR: The root/superuser cannot install vidsift, it is a user program. Please run this script when installing without superuser/root priviledges."
+        exit 1
+    fi
+}
+
 function main {
     init "$@"
     check_installation_path "$@"
     check_args "$@"
+    # if the user only want to set up the background service
     if [[ "$daemon_setup" == "true" ]]; then
-        echo "Setting up the service..."
-        set_up_daemon "$@"
+        echo "Any args concerning the installation of vidsift just like the installation of vidsift itself will be skipped, because this script is running as root."
+        if [[ "$install_vidsift" == "false" ]]; then
+            echo "Setting up the service..."
+            set_up_daemon "$@"
+            exit 0
+        else
+            echo "ERROR: Only the root/superuser is allowed to set up the background service"
+            exit 0
+        fi
     fi
+    # if the user want to install vidsift from the github repo or locally
     if [[ "$fresh_install" == "true" ]]; then
+        before_install
         echo "Performing a fresh install..."
         clone_repo "$@"
     fi
+    before_install
     create_directories "$@"
     cp_files "$@"
     set_permissions "$@"
