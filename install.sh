@@ -41,7 +41,7 @@ function clone_repo {
 
 function init {
     # checking if the root user or a regular user is running the script
-    if [[ "$EUID" -ne 0 || -z "$SUDO_USER" ]]; then
+    if [[ "$EUID" -ne 0 ]]; then
         install_vidsift="true"
     else
         install_vidsift="false"
@@ -99,9 +99,8 @@ Description=Service for running vidsift in the background
 After=network-online.target
 
 [Service]
-Type=simple
+Type=oneshot
 ExecStart=$SUDO_HOME/.local/bin/vidsift
-ExecStartPost=/usr/bin/sleep 900
 User=$SUDO_USER
 
 [Install]
