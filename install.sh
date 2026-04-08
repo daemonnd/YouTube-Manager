@@ -79,6 +79,7 @@ function create_directories {
 }
 
 function set_up_daemon {
+    SUDO_USER="${SUDO_USER:-}"
     if [ -n "$SUDO_USER" ]; then
         SUDO_HOME=$(getent passwd "$SUDO_USER" | awk -F ':' '{ print $6 }')
     else
@@ -188,7 +189,7 @@ function check_installation_path {
     VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
     if echo "$PATH" | grep -IFq "$VIDSIFT_BIN_DIR"; then
         mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
-        echo "vidsift bin directioty $VIDSIFT_BIN_DIR is already in your PATH."
+        echo "vidsift bin directory $VIDSIFT_BIN_DIR is already in your PATH."
     else
         mkdir -p "$VIDSIFT_BIN_DIR" # create if it does not exist
         echo "export PATH="'"$PATH:'$VIDSIFT_BIN_DIR'"' >>"$HOME/.bashrc"
@@ -201,13 +202,13 @@ function main {
     init "$@"
     check_installation_path "$@"
     check_args "$@"
-    if [[ "$fresh_install" == "true" ]]; then
-        echo "Performing a fresh install..."
-        clone_repo "$@"
-    fi
     if [[ "$daemon_setup" == "true" ]]; then
         echo "Setting up the service..."
         set_up_daemon "$@"
+    fi
+    if [[ "$fresh_install" == "true" ]]; then
+        echo "Performing a fresh install..."
+        clone_repo "$@"
     fi
     create_directories "$@"
     cp_files "$@"
