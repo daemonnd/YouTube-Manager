@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 
 function rm_tmp_files {
-    #    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
+    rm "$VIDSIFT_DATA_DIR"/parsed_config.json 2>/dev/null || true
     rm "/tmp/vidsift_transcript.txt" 2>/dev/null || true
     rm "/tmp/vidsift_title.txt" 2>/dev/null || true
 }
