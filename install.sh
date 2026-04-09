@@ -74,6 +74,9 @@ function init {
     # set default values for flags
     fresh_install="true"
     daemon_setup="false"
+
+    # export PATH with additional, probably needed bin directories
+    export PATH="$PATH:/usr/local/bin:/bin:/usr/bin:$VIDSIFT_BIN_DIR"
 }
 
 function create_directories {
