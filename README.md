@@ -68,6 +68,38 @@ The goal of this project is to solve this problem. To see how exactly, check out
 
 5. Run vidsift.sh with `./vidsift.sh`
 
+### How to set up the background service
+
+To set up a background service that runs vidsift every 15 minutes (default, can be changed by editing the systemd timer),
+you need to run install.sh with as root and use the `daemon-setup` argument.
+The systemd service is named `vidsift-manager.service` and the systemd timer is named `vidsift-manager.timer`.
+They live both in `/etc/systemd/system/`
+
+```bash
+# first, cd to the vidsift project dir
+sudo ./install.sh daemon-setup
+```
+
+That will enable the systemd timer starting the service. You can also enable it manually with this:
+
+```bash
+sudo systemctl start vidsift-manager.service
+```
+
+To check logs and status of the background service, you can try these commands:
+
+```bash
+# checking the status of the timer
+systemctl status vidsift-manager.timer
+# checking the status of the service
+systemctl status vidsift-manager.service
+
+# checking the logs of the timer
+journalctl -u vidsift-manager.timer
+# checking the logs of the service
+journalctl -u vidsift-manager.service
+```
+
 ## Issues & How to fix them
 
 - YouTube rate limit exeded: Add the url to already_processed_urls.txt
