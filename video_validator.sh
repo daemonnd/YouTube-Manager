@@ -6,13 +6,19 @@
 # strict mode
 set -Eeuo pipefail
 
+# rm tmp files function
+function rm_tmp_files {
+    rm -f "${fabric_stdout_file:=}" 2>/dev/null || true
+    rm -f "${fabric_stderr_file:=}" 2>/dev/null || true
+}
+
 # Cleanup function
 function cleanup {
     local exit_code="$?"
     echo "Script video_validator.sh interupted or failed. Cleaning up..."
 
     # remove tmp files
-
+    rm_tmp_files
     # exit the script, preserving the exit code
     exit "$exit_code"
 }
@@ -53,18 +59,33 @@ function create_final_system_prompt {
 }
 
 function rate_video {
-    score=$(echo "$transcript" | fabric --vendor "$AI_PROVIDER" --model "$AI_MODEL" -sp vidsift_score_youtube_transcript)
-    # Check if score is a number
-    if [[ "$score" =~ ^[0-9]+$ ]]; then
+    fabric_stdout_file=$(mktemp)
+    fabric_stderr_file=$(mktemp)
+    if ! echo "$transcript" | fabric --vendor "$AI_PROVIDER" --model "$AI_MODEL" -sp vidsift_score_youtube_transcript >"$fabric_stdout_file" 2>"$fabric_stderr_file"; then
         :
+    fi
+    score=$(cat "$fabric_stdout_file")
+    if [[ $(cat "$fabric_stderr_file") == *"empty response"* ]]; then
+        score=-3
+        echo "$score"
+        return 0
+    fi
+    if [[ -z $(cat "$fabric_stderr_file") ]]; then
+
+        # Check if score is a number
+        if [[ "$score" =~ ^[0-9]+$ ]]; then
+            :
+        else
+            score=-2
+        fi
+        # Check if the score is between 0 and 100 (0 & 100 are included)
+        if [[ ! "$score" -ge 0 && ! "$score" -le 100 ]]; then
+            score=-1
+        fi
+        echo "$score"
     else
-        score=-2
+        cleanup
     fi
-    # Check if the score is between 0 and 100 (0 & 100 are included)
-    if [[ ! "$score" -ge 0 && ! "$score" -le 100 ]]; then
-        score=-1
-    fi
-    echo "$score"
 
 }
 
@@ -75,6 +96,8 @@ function main {
     create_final_system_prompt
 
     rate_video "$@"
+
+    rm_tmp_files
 }
 
 # call main with all args, as given
