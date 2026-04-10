@@ -110,6 +110,8 @@ function main {
             elif [[ "$score" -eq -2 ]]; then
                 echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the ai did not return a number as score."
                 continue
+            elif [[ "$score" -eq -3 ]]; then
+                echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the ai did not return anything, the response was empty."
             # if the score is above 80, it gets downloaded
             elif [[ "$score" -gt 80 ]]; then
                 download_video "$url"
