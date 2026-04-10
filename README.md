@@ -35,6 +35,7 @@ The goal of this project is to solve this problem. To see how exactly, check out
 - Runs in the background, no user intervention required
 - config system with options for ai model selection, destination directories, etc.
 - channel specific actions performed on every video (validate, summary, download) depending on the channel
+- locking mechanism for making file-related interactions from vidsift more stable
 
 ## Usage
 
