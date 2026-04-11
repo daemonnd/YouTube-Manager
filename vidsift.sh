@@ -84,81 +84,97 @@ function init {
 }
 
 function download_video {
-    echo "Downloading ${1}..."
+    log "INFO" "Downloading ${1}..."
     "${VIDSIFT_HELPER_SCRIPTS_DIR}/downloader" "$1" "$download_path"
+    log "DEBUG" "Downloading ${url}... Done"
 }
 
 function summarize_video {
-    echo "Summarizing transcript of ${1}..."
+    log "INFO" "Summarizing transcript of ${1}..."
     "$VIDSIFT_HELPER_SCRIPTS_DIR"/summarizer "$summary_path"
+    log "DEBUG" "Summarizing ${1}... Done"
+}
+
+function add_url {
+    log "DEBUG" "Adding url $1 to $VIDSIFT_DATA_DIR/already_processed_urls.txt ..."
+    echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
+    log "DEBUG" "Adding url $1 to $VIDSIFT_DATA_DIR/already_processed_urls.txt ... Done"
 }
 
 function main {
     init "$@"
     parse_flags "$@"
+    log "DEBUG" "Vidsift has been initalized successfully and parsed the flags with success."
     while read -r url name action; do
-        echo "Processing video $url from ${name} with action ${action}..."
+        log "DEBUG" "Getting all the urls to process ended successfully."
+        log "INFO" "Processing video $url from ${name} with action ${action}..."
         # check wether the video should be validated, downloaded or summarized, depending on the given action
         # validate: let ai validate the transcript and decide wether to download, summarize or do nothing with the video, depending on the score
         if [[ "$action" == "validate" ]]; then
             # fetch the necessary video data for validation and maybe summarization
             if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url" </dev/null; then
-                echo "ERROR: Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
+                log "WARNING" "Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
                 continue
             fi
             # get the score from the ai
+            log "DEBUG" "Starting validation of $url"
             score=$("$VIDSIFT_HELPER_SCRIPTS_DIR"/video_validator "$url" "$name" </dev/null)
+            log "DEBUG" "Validating $url from $name returned $score as score"
             # if there was an error during the validation, the video gets skipped
             if [[ "$score" -eq -1 ]]; then
-                echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the score from the ai was not between 0 and 100."
-                echo "Therefore, nothing will be done with this video."
+                log "WARNING" "Failed to download, summarize or do nothing with the video ${url}, because the score from the ai was not between 0 and 100. Therefore, nothing will be done with this video."
                 continue
             # if the ai did not return a number as score, the video gets skipped
             elif [[ "$score" -eq -2 ]]; then
-                echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the ai did not return a number as score."
+                log "WARNING" "Failed to download, summarize or do nothing with the video ${url}, because the ai did not return a number as score."
                 continue
             elif [[ "$score" -eq -3 ]]; then
-                echo "ERROR: Failed to download, summarize or do nothing with the video ${url}, because the ai did not return anything, the response was empty."
+                log "ERROR" "Failed to download, summarize or do nothing with the video ${url}, because the ai did not return anything, the response was empty."
             # if the score is above 80, it gets downloaded
             elif [[ "$score" -gt 80 ]]; then
                 download_video "$url"
                 # add the url to already_processed_urls.txt
-                echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
+                add_url "$url"
             # if the score is between 40 and 80, it gets summarized
             elif [[ "$score" -lt 80 && "$score" -gt 40 || "$score" -eq 80 ]]; then
+                log "DEBUG" "Summarizing ${url}..."
                 summarize_video "$url"
+                log "DEBUG" "Summarizing ${url}... Done"
                 # add the url to already_processed_urls.txt
-                echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
+                add_url "$url"
+                log "DEBUG" "Added $url to already_processed_urls.txt"
             # if the score is below 40, it gets neither downloaded nor summarized
             else
-                echo "The video with the url $url would neither have been summarized nor been downloaded, because its score is $score"
+                log "INFO" "The video with the url $url does not get summarized nor been downloaded, because its score is $score"
                 # add the url to already_processed_urls.txt
-                echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
+                add_url "$url"
             fi
         # download: download the video without validating it with the ai
         elif [[ "$action" == "download" ]]; then
+            log "DEBUG" "Downloading ${url}..."
             download_video "$url"
+            log "DEBUG" "Downloading ${url}... Done"
             # add the url to already_processed_urls.txt
-            echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
+            add_url "$url"
         # summarize: summarize the video transcript without validating it with ai
         elif [[ "$action" == "summary" ]]; then
             # fetch the necessary video data for summarization (transcript and title)
             if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url" </dev/null; then
-                echo "ERROR: Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
+                log "ERROR" "Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
             fi
             summarize_video "$url"
             # add the url to already_processed_urls.txt
-            echo "$url" >>"$VIDSIFT_DATA_DIR"/already_processed_urls.txt
+            add_url "$url"
         # if the action is not valid, nothing happend with the video
         else
-            echo "ERROR: Action $action for video $url from channel $name is not valid. Therefore, nothing will be done with this video."
+            log "CRITICAL" "Action $action for video $url from channel $name is not valid. Therefore, nothing will be done with this video."
             continue
         fi
 
     done < <("$VIDSIFT_HELPER_SCRIPTS_DIR"/url_collector | "$VIDSIFT_HELPER_SCRIPTS_DIR"/url_validator)
 
     # cleanup tmp files
-    echo "All videos processed. Cleaning up..."
+    log "INFO" "All videos processed. Cleaning up..."
     rm_tmp_files
 }
 
