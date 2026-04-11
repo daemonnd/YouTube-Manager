@@ -34,7 +34,9 @@
     // ####################################
     // video filtering options, which videos should be used for later processing
     "video_filtering": {
-        "uploaded_before": "14 days ago" // uses date -d
+        "uploaded_before": "14 days ago", // uses date -d
+        // how many days from today channels where YouTube rate limits occur should be blocked to wait the the YouTube rate limit disappers
+        "rate_limit_unblock_time": "7 days" // uses date -d
     },
     // #####################################
     // ----------General processing---------

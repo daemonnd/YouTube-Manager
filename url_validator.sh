@@ -27,10 +27,10 @@ function check_args {
 }
 
 function main {
-    while read -r url name action; do
+    while read -r url name action channelid; do
         # only print the video url and creator name if it is not in already_processed_urls.txt
         if ! grep -q "$url" <"$VIDSIFT_DATA_DIR"/already_processed_urls.txt; then
-            echo "$url $name $action"
+            echo "$url $name $action" "$channelid"
         fi
     done
 }
