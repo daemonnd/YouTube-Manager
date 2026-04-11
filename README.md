@@ -41,8 +41,8 @@ The goal of this project is to solve this problem. To see how exactly, check out
 
 1. Install it (pre-v1, not ready for general use)
 2. Create a dir at ~/Videos/vidsift/ and one at ~/Documents/vidsift/
-3. Create a new file name channelids.json
-    Edit it, make it like this:
+3. Edit vidsifts `config.jsonc`, usually located at `~/.config/vidsift/config.jsonc`
+    Edit it, make it like this for the channelids:
 
     ```json
     {
@@ -60,6 +60,9 @@ The goal of this project is to solve this problem. To see how exactly, check out
         "pewdiepie": "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
     }
     ```
+
+    Note:
+    It is also recommended to add a `--cookies-from-browser firefox` (or whatever browser you are using) to avoid YouTube related issues at the custom yt-dlp args under `general_processing`.
 
 4. Edit the custom instructions:
 
@@ -147,10 +150,7 @@ Script url_collector.sh interupted or failed. Cleaning up...
 
 ## Future improvements
 
-- make it with a daemon service
 - job queue
 - retry system
-- structured logging
 - rate limit handling
 - plugin architecture
-- a background daemon that manages everything
