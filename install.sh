@@ -26,9 +26,12 @@ function check_args {
         case "$arg" in
         "local")
             fresh_install="false"
-            ;;&
+            ;;
         "daemon-setup")
             daemon_setup="true"
+            ;;
+        *)
+            echo "Unknown arg: ${arg}. Exiting." && exit 1
             ;;
         esac
     done
