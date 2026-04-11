@@ -45,13 +45,18 @@ function validate_target_dir {
 function set_env_vars {
     # set directories
     # config dir
-    export VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME-${HOME}/.config/vidsift/}}"
+    VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR:-${XDG_CONFIG_HOME-${HOME}/.config/vidsift/}}"
+    export VIDSIFT_CONFIG_DIR="${VIDSIFT_CONFIG_DIR%/}"
+
     # data dir
-    export VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share/vidsift/}}"
+    VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share/vidsift/}}"
+    export VIDSIFT_DATA_DIR="${VIDSIFT_DATA_DIR%/}"
     # vidsift bin dir
-    export VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
+    VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR:-${XDG_BIN_HOME:-"$HOME/.local/bin/"}}"
+    export VIDSIFT_BIN_DIR="${VIDSIFT_BIN_DIR%/}"
     # helper scripts dir
-    export VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
+    VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR:-${XDG_BIN_HOME:-"$HOME/.local/lib/vidsift"}}"
+    export VIDSIFT_HELPER_SCRIPTS_DIR="${VIDSIFT_HELPER_SCRIPTS_DIR%/}"
 }
 
 function init {
@@ -105,14 +110,14 @@ function main {
     init "$@"
     parse_flags "$@"
     log "DEBUG" "Vidsift has been initalized successfully and parsed the flags with success."
-    while read -r url name action; do
+    while read -r url name action channelid; do
         log "DEBUG" "Getting all the urls to process ended successfully."
         log "INFO" "Processing video $url from ${name} with action ${action}..."
         # check wether the video should be validated, downloaded or summarized, depending on the given action
         # validate: let ai validate the transcript and decide wether to download, summarize or do nothing with the video, depending on the score
         if [[ "$action" == "validate" ]]; then
             # fetch the necessary video data for validation and maybe summarization
-            if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url" </dev/null; then
+            if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url" "$channelid" </dev/null; then
                 log "WARNING" "Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
                 continue
             fi
@@ -159,7 +164,7 @@ function main {
         # summarize: summarize the video transcript without validating it with ai
         elif [[ "$action" == "summary" ]]; then
             # fetch the necessary video data for summarization (transcript and title)
-            if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url" </dev/null; then
+            if ! "$VIDSIFT_HELPER_SCRIPTS_DIR"/fetch_video_data "$url" "$channelid" </dev/null; then
                 log "ERROR" "Failed to fetch the transcript or title for the video ${url}. Therefore, this video will be skipped."
             fi
             summarize_video "$url"
