@@ -30,6 +30,8 @@ function init {
     mapfile -t yt_dlp_args < <(cat "$VIDSIFT_DATA_DIR"/parsed_config.json | jq -r '.general_processing."yt-dlp_args"[]')
     # get the download-specific yt-dlp args used for the download operation from the parsed config file and add them to the general yt-dlp args
     mapfile -t download_specific_yt_dlp_args < <(cat "$VIDSIFT_DATA_DIR"/parsed_config.json | jq -r '.video_download."yt-dlp_args"[]')
+    # source the log file
+    source "$VIDSIFT_HELPER_SCRIPTS_DIR"/log
 }
 
 function rename_dest_path {
@@ -41,6 +43,7 @@ function rename_dest_path {
 
 function main {
     init "$@"
+    log "DEBUG" "Initializing downloader.sh went well."
     # cd to target dir
     cd "$2"
     yt-dlp \
