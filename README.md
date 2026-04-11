@@ -69,6 +69,14 @@ The goal of this project is to solve this problem. To see how exactly, check out
 
 5. Run vidsift.sh with `./vidsift.sh`
 
+### Using vidsift with flags for output control
+
+- no flag: Only output warnings, errors and critical
+- `-v`: Output critical, errors, warnings and infos
+- `-vv`: Output critical, errors, warnings, infos and debug logs
+- `-s`: Only output errors and critical messages
+- `-ss`: Only output critical error messages
+
 ### How to set up the background service
 
 To set up a background service that runs vidsift every 15 minutes (default, can be changed by editing the systemd timer),
@@ -129,6 +137,7 @@ Script url_collector.sh interupted or failed. Cleaning up...
 
 ### Optional Dependencies
 
+- one of the supported browsers by yt-dlp with a signed in google account to avoid YouTube related issues
 - [file-renamer](https://github.com/daemonnd/file-renamer) for automatically rename video and summary files for a linux fs
 - [systemd](https://systemd.io/) for the vidsift background service
 
