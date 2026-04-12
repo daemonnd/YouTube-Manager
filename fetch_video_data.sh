@@ -41,6 +41,7 @@ function init {
     # getting the date that should be used until a youtube rate limit affected channel gets unblocked
     RATE_LIMIT_UNBLOCK_DATE="$(jq -r '.video_filtering.rate_limit_unblock_time' "$VIDSIFT_DATA_DIR/parsed_config.json")"
     RATE_LIMIT_UNBLOCK_DATE="$(date -d "$RATE_LIMIT_UNBLOCK_DATE" '+%F')"
+    TRANSCRIPT_CHUNK_LENGTH="$(jq -r '.general_processing.transcript_chunk_length' "$VIDSIFT_DATA_DIR/parsed_config.json")"
     log "DEBUG" "Initializing fetch_video_data.sh went well"
 }
 
@@ -66,7 +67,7 @@ function fetch_transcript {
 
 function chunk_transcript {
     rm -f /tmp/vidsift_transcript_* || true
-    words_per_chunk=1000
+    words_per_chunk="$TRANSCRIPT_CHUNK_LENGTH"
 
     cat /tmp/vidsift_transcript.txt | awk -v words_per_chunk="$words_per_chunk" -v data_dir="$VIDSIFT_DATA_DIR" '
     BEGIN { printf "" > (data_dir "/chunk_files") }
