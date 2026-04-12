@@ -49,10 +49,9 @@ function main {
     yt-dlp \
         "${yt_dlp_args[@]}" \
         "${download_specific_yt_dlp_args[@]}" \
-        --exec 'if [[ ! -x /usr/local/bin/rename_one_file.sh ]]; then
+        --exec 'if [ ! -x /usr/local/bin/rename_one_file.sh ]; then
                     exit 0
                 fi
-                echo $0
                 /usr/local/bin/rename_one_file.sh 2 ' \
         "$1"
 }
