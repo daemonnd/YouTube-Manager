@@ -34,7 +34,6 @@ function check_args {
 }
 
 function init {
-    transcript="$(cat /tmp/vidsift_transcript.txt)"
     # get ai model and provider
     AI_MODEL="$(jq -r '.general_processing.ai_model' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     AI_PROVIDER="$(jq -r '.general_processing.ai_provider' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
@@ -59,34 +58,45 @@ function create_final_system_prompt {
 }
 
 function rate_video {
-    fabric_stdout_file=$(mktemp)
-    fabric_stderr_file=$(mktemp)
-    if ! echo "$transcript" | fabric --vendor "$AI_PROVIDER" --model "$AI_MODEL" -sp vidsift_score_youtube_transcript >"$fabric_stdout_file" 2>"$fabric_stderr_file"; then
-        :
-    fi
-    score=$(cat "$fabric_stdout_file")
-    if [[ $(cat "$fabric_stderr_file") == *"empty response"* ]]; then
-        score=-3
-        echo "$score"
+    score=()
+    # iterating over each video transcript chunk
+    while read -r chunk_file; do
+        transcript=$(cat "$chunk_file")
+        fabric_stdout_file=$(mktemp)
+        fabric_stderr_file=$(mktemp)
+        if ! echo "$transcript" | fabric --vendor "$AI_PROVIDER" --model "$AI_MODEL" -sp vidsift_score_youtube_transcript >"$fabric_stdout_file" 2>"$fabric_stderr_file"; then
+            :
+        fi
+        if [[ $(cat "$fabric_stderr_file") == *"empty response"* ]]; then
+            continue
+        fi
+        if [[ -z $(cat "$fabric_stderr_file") ]]; then
+
+            # Check if score is a number
+            if [[ "${score[-1]}" =~ ^[0-9]+$ ]]; then
+                :
+            else
+                continue
+            fi
+            # Check if the score is between 0 and 100 (0 & 100 are included)
+            if [[ ! "${score[-1]}" -ge 0 && ! "${score[-1]}" -le 100 ]]; then
+                continue
+            fi
+        else
+            cleanup
+        fi
+        score+=("$(cat "$fabric_stdout_file")")
+    done <"$VIDSIFT_DATA_DIR/chunk_files"
+    if [[ "${#score[@]}" -eq 0 ]]; then
+        echo "-1"
         return 0
     fi
-    if [[ -z $(cat "$fabric_stderr_file") ]]; then
-
-        # Check if score is a number
-        if [[ "$score" =~ ^[0-9]+$ ]]; then
-            :
-        else
-            score=-2
-        fi
-        # Check if the score is between 0 and 100 (0 & 100 are included)
-        if [[ ! "$score" -ge 0 && ! "$score" -le 100 ]]; then
-            score=-1
-        fi
-        echo "$score"
-    else
-        cleanup
-    fi
-
+    total=0
+    for s in "${score[@]}"; do
+        total=$((total + s))
+    done
+    avg=$((total / "${#score[@]}"))
+    echo "$avg"
 }
 
 function main {

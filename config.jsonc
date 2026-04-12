@@ -59,7 +59,11 @@
             "$HOME/.local/bin/",
             "/usr/bin/",
             "/usr/local/bin/"
-        ]
+        ],
+        // After how many words in a transcript vidsift should make the next chunk of the transcript.
+        // Each chunk is used seperately to avoid too much text that goes over the context length of the ai model.
+        // The number represents the number of words
+        "transcript_chunk_length": 2000
     },
     //
     // #####################################

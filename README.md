@@ -1,9 +1,12 @@
 # VidSift
 
-Ai-powered YouTube feed filtering and video relevance scoring.
+Ai-powered YouTube feed filtering and video relevance scoring
 
-YouTube has a lot of videos, we all have a lot of YouTube channels we like, but there is still one problem:
-The Time.
+YouTube has a lot of videos, we all have a lot of YouTube channels we like, but that also brings two main Problems:
+
+1. the Time, because consuming all of that costs a lot of time
+2. Distractions, because we always see new videos that we click which then causes the first Problem
+
 We don't have the time to fully watch each and every video. But we also want to watch the good ones.
 The problem is usually that we don't know which video is good and which one is not worth our time.
 
@@ -18,35 +21,53 @@ The goal of this project is to solve this problem. To see how exactly, check out
 - It checks if the latest urls have already been processed (if they are on already_processed_urls.txt), if it is already on the file, it goes to the next url, else:
 - It performs an action depending on how defined in `config.jsonc`:
 - validating:
-  - It fetches the transcript with fabric
+  - It fetches the transcript with fabric and devides it into multiple chunks if it is too long
   - It feeds the transcript into ai (any supported by fabric) and validates it, it gets a score from 0 to 100
   - depending on the score, here is what happens:
-  - score from 100 to 80: Download the video
-  - score from 80 to 40: Summarize the video
-  - score from 40 to 0: do nothing
+    - score from 100 to 80: Download the video
+    - score from 80 to 40: Summarize the video
+    - score from 40 to 0: do nothing
 - downloading:
   - it downloads the video directly, without validation
 summarizing:
   - it Summarizes the video transcript directly, without validation
 - It writes the video url to already_processed_urls.txt
 
+If, while fetching the transcript or title, a YouTube rate limit is reached,
+vidsift blocks the channel automatically for a time range defined by the config (default: 7 days)
+
 ## Features
 
 - RSS integration
-- transcript extraction
-- video filtering, only takes videos from the last 2 weeks
+- transcript extraction and chunking
+- video filtering, only takes videos from the last 2 weeks (can be changed in config)
 - make custom system prompt for ai validation depending on the channel
 - LLM scoring
 - Automated process of fetching, validating, taking action depending on validation
 - Runs in the background, no user intervention required
-- config system with options for ai model selection, destination directories, etc.
+- config file for customizing vidsift (config.jsonc)
 - channel specific actions performed on every video (validate, summary, download) depending on the channel
 - locking mechanism for making file-related interactions from vidsift more stable
+- auto-block of channels that have YouTube rate limit issues and auto-unblocking after
 
 ## Usage
 
-1. Install it (pre-v1, not ready for general use)
-2. Edit vidsifts `config.jsonc`, usually located at `~/.config/vidsift/config.jsonc`
+### Installation
+
+Install it with the following commands
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/daemonnd/VidSift/main/install.sh | bash
+# if it tells you to update your ~/.bashrc file
+source ~/.bashrc
+# if you want the background service
+cd vidsift/
+sudo ./install.sh daemon-setup
+```
+
+### Getting started
+
+1. Edit vidsifts `config.jsonc`, usually located at `~/.config/vidsift/config.jsonc`
     Make sure to set destination directories for both summaries and downloads.
     Edit it like this for the channelids:
 
@@ -68,15 +89,20 @@ summarizing:
     ```
 
     Note:
-    It is also recommended to add a `--cookies-from-browser firefox` (or whatever browser you are using) to avoid YouTube related issues at the custom yt-dlp args under `general_processing`.
+    It is also recommended to add a `--cookies-from-browser firefox` (or whatever browser you are using)
+    to avoid YouTube related issues at the custom yt-dlp args under `general_processing`.
+    To use ai features, set the ai provider and model to what you use.
 
-3. Edit the custom instructions:
+2. Edit the custom instructions:
 
-    - go to ./custom_channel_instructions/
+    - go to ~/.config/vidsift/custom_channel_instructions/
     - create a file for each name and put in what kind of videos you want to see from that channel
     - if you want to do it for typecraft: touch ./custom_channel_instructions/typecraft.md
 
-4. Run vidsift.sh with `vidsift`
+3. Set up the ai (recommended, but not needed if you don't want summaries and validation)
+    - Run `fabric --setup` or edit fabrics `.env` file, usually located at `~/.config/fabric/.env`.
+
+4. Run vidsift with `vidsift` or start the service with `sudo systemctl start vidsift-manager.timer`
 
 ### Using vidsift with flags for output control
 
@@ -85,6 +111,11 @@ summarizing:
 - `-vv`: Output critical, errors, warnings, infos and debug logs
 - `-s`: Only output errors and critical messages
 - `-ss`: Only output critical error messages
+
+Note:
+When using the background service, the default after
+`sudo ./install.sh daemon-setup` will be no flags.
+Feel free to change that with `sudo systemctl edit vidsift-manager.service`.
 
 ### How to set up the background service
 
@@ -121,7 +152,6 @@ journalctl -u vidsift-manager.service
 
 ## Issues & How to fix them
 
-- YouTube rate limit exeded: Add the url to already_processed_urls.txt
 - Parser error in url_collector.sh: Update the channel id in config.jsonc, check out the url manually.
 Exact Error message when that last happened:
 
@@ -159,5 +189,4 @@ Script url_collector.sh interupted or failed. Cleaning up...
 
 - job queue
 - retry system
-- rate limit handling
 - plugin architecture
