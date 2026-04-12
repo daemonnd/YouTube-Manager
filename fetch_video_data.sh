@@ -64,6 +64,32 @@ function fetch_transcript {
     log "DEBUG" "Fetching the transcript from $1 with the additional yt-dlp_args ${yt_dlp_args[*]}... Done (It has been written to /tmp/vidsift_transcript.txt)"
 }
 
+function chunk_transcript {
+    rm -f /tmp/vidsift_transcript_* || true
+    words_per_chunk=1000
+
+    cat /tmp/vidsift_transcript.txt | awk -v words_per_chunk="$words_per_chunk" -v data_dir="$VIDSIFT_DATA_DIR" '
+    BEGIN { printf "" > (data_dir "/chunk_files") }
+    {
+    if (NF < words_per_chunk) { 
+        print $0 >/tmp/vidsift_transcript_0 
+        print "/tmp/vidsift_transcript_0" >> (data_dir "/chunk_files")
+    } else { 
+        a=0
+        for (i=1; i<NF; i++) { 
+            content = content $i FS 
+            if (i % words_per_chunk == 0) { 
+                a++;
+                print content >"/tmp/vidsift_transcript_" a
+                content="" 
+                print "/tmp/vidsift_transcript_" a >> (data_dir "/chunk_files")
+            }
+        }
+    }
+} '
+
+}
+
 # function to fetch the title of the video for later use as name for the summary file
 function fetch_title {
     title_stdout_file=$(mktemp)
@@ -89,6 +115,7 @@ function fetch_title {
 function main {
     init "$@"
     fetch_transcript "$@"
+    chunk_transcript "$@"
     fetch_title "$@"
 }
 
