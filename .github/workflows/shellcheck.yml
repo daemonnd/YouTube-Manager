@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - main
 
 name: "Trigger: Push action"
 permissions: {}
@@ -14,3 +15,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: .
+          severity: error
