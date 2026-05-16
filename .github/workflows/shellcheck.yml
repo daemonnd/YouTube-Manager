@@ -5,7 +5,7 @@ on:
       - main
   workflow_dispatch: 
 
-name: "Trigger: Push action"
+name: "Shellcheck on push action"
 permissions: {}
 
 jobs:
