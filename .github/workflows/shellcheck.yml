@@ -3,6 +3,7 @@ on:
     branches:
       - master
       - main
+  workflow_dispatch: 
 
 name: "Trigger: Push action"
 permissions: {}
