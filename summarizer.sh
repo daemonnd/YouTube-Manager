@@ -11,21 +11,22 @@ function rm_tmp_files {
     rm -f "${fabric_stderr_file:=}" 2>/dev/null || true
 }
 
-# Cleanup function
-function cleanup {
-    local exit_code="$?"
-    echo "Script summarizer.sh interrupted or failed. Cleaning up..."
+cleanup() {
+    local exit_code="$1"
 
-    # remove tmp files
+    echo "Script video_validator.sh interrupted or failed. Cleaning up..." >&2
     rm_tmp_files
-    # exit the script, preserving the exit code
+
     exit "$exit_code"
 }
 
-# trap errors
-trap 'echo "Error on line $LINENO in summarizer.sh: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
-# trap signals
-trap 'cleanup' INT TERM ERR
+trap '
+    exit_code=$?
+    echo "Error on line $LINENO video_validator.sh: command \"$BASH_COMMAND\" exited with status $exit_code" >&2
+    cleanup "$exit_code"
+' ERR
+
+trap 'cleanup "$?"' INT TERM
 
 function check_args {
     :
@@ -80,7 +81,7 @@ function main {
         exit 0
     else
         # if not, exit with an error
-        cleanup
+        cleanup 1
     fi
 }
 
