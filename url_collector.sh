@@ -41,6 +41,7 @@ function init {
     VALIDATE_CHANNELS="$(jq '.channel_operations.validate' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     DOWNLOAD_CHANNELS="$(jq '.channel_operations.download' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
     SUMMARY_CHANNELS="$(jq '.channel_operations.summary' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
+    export VALIDATE_CHANNELS DOWNLOAD_CHANNELS SUMMARY_CHANNELS
     # get the date when the videos should be newer than
     UPLOADED_BEFORE="$(jq -r '.video_filtering.uploaded_before' "$VIDSIFT_DATA_DIR"/parsed_config.json)"
 }

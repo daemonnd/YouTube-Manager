@@ -11,22 +11,22 @@ function rm_tmp_files {
     rm -f "${fabric_stdout_file:=}" 2>/dev/null || true
     rm -f "${fabric_stderr_file:=}" 2>/dev/null || true
 }
+cleanup() {
+    local exit_code="$1"
 
-# Cleanup function
-function cleanup {
-    local exit_code="$?"
-    echo "Script video_validator.sh interupted or failed. Cleaning up..."
-
-    # remove tmp files
+    echo "Script video_validator.sh interrupted or failed. Cleaning up..." >&2
     rm_tmp_files
-    # exit the script, preserving the exit code
+
     exit "$exit_code"
 }
 
-# trap errors
-trap 'echo "Error on line $LINENO video_validator.sh: command \"$BASH_COMMAND\" exited with status $?" >&2' ERR
-# trap signals
-trap 'cleanup' INT TERM ERR
+trap '
+    exit_code=$?
+    echo "Error on line $LINENO video_validator.sh: command \"$BASH_COMMAND\" exited with status $exit_code" >&2
+    cleanup "$exit_code"
+' ERR
+
+trap 'cleanup "$?"' INT TERM
 
 function check_args {
     : "${1:?ERROR: The first arg that should contain the video url has not been set}"
@@ -79,11 +79,11 @@ function rate_video {
                 continue
             fi
             # Check if the score is between 0 and 100 (0 & 100 are included)
-            if [[ ! "${score[-1]}" -ge 0 && ! "${score[-1]}" -le 100 ]]; then
+            if [[ ! "${score[-1]}" -ge 0 || ! "${score[-1]}" -le 100 ]]; then
                 continue
             fi
         else
-            cleanup
+            cleanup 1
         fi
         score+=("$(cat "$fabric_stdout_file")")
     done <"$VIDSIFT_DATA_DIR/chunk_files"
