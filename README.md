@@ -1,3 +1,13 @@
+
+<blockquote class="red-quote">
+  <h2>This repository is no longer maintained.</h2>
+  <p>If you want to use vidsift, check out that repository instead:
+    <a href="https://github.com/daemonnd/vidsift">https://github.com/daemonnd/vidsift</a>
+  </p>
+</blockquote>
+
+
+
 # VidSift
 
 Ai-powered YouTube feed filtering and video relevance scoring
